@@ -1,0 +1,242 @@
+[
+  {
+    "name": "Fresh Apples",
+    "category": "Fruits",
+    "description": "Crisp and naturally sweet apples",
+    "price": 150,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Grapes",
+    "category": "Fruits",
+    "description": "Fresh sweet grapes",
+    "price": 150,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Bananas",
+    "category": "Fruits",
+    "description": "Naturally sweet ripe bananas",
+    "price": 60,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Oranges",
+    "category": "Fruits",
+    "description": "Juicy fresh oranges",
+    "price": 120,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1547514701-42782101795e?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Mangoes",
+    "category": "Fruits",
+    "description": "Sweet seasonal mangoes",
+    "price": 180,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1553279768-865429fa0078?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Potato",
+    "category": "Vegetables",
+    "description": "Fresh potatoes for everyday cooking",
+    "price": 38,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Tomato",
+    "category": "Vegetables",
+    "description": "Fresh red tomatoes",
+    "price": 40,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Onion",
+    "category": "Vegetables",
+    "description": "Fresh cooking onions",
+    "price": 45,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1508747703725-719777637510?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Carrot",
+    "category": "Vegetables",
+    "description": "Crunchy fresh carrots",
+    "price": 55,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1445282768818-728615cc910a?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Broccoli",
+    "category": "Vegetables",
+    "description": "Fresh green broccoli",
+    "price": 80,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Milk",
+    "category": "Dairy",
+    "description": "Fresh creamy milk",
+    "price": 60,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Curd",
+    "category": "Dairy",
+    "description": "Smooth and fresh curd",
+    "price": 45,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1571212515416-fca9f4a5c8d0?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Butter",
+    "category": "Dairy",
+    "description": "Creamy dairy butter",
+    "price": 55,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Cheese",
+    "category": "Dairy",
+    "description": "Everyday sliced cheese",
+    "price": 120,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Paneer",
+    "category": "Dairy",
+    "description": "Fresh soft paneer",
+    "price": 90,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Bread",
+    "category": "Bakery",
+    "description": "Soft everyday bread",
+    "price": 40,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Croissant",
+    "category": "Bakery",
+    "description": "Flaky buttery croissant",
+    "price": 65,
+    "stock": 18,
+    "image": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Cake",
+    "category": "Bakery",
+    "description": "Fresh bakery cake",
+    "price": 250,
+    "stock": 10,
+    "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Muffins",
+    "category": "Bakery",
+    "description": "Soft freshly baked muffins",
+    "price": 70,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Buns",
+    "category": "Bakery",
+    "description": "Soft bakery buns",
+    "price": 35,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1608198093002-ad4e005484df?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Biscuits",
+    "category": "Snacks",
+    "description": "Crunchy tea-time biscuits",
+    "price": 30,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Cookies",
+    "category": "Snacks",
+    "description": "Chocolate chip cookies",
+    "price": 80,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Chips",
+    "category": "Snacks",
+    "description": "Crispy potato chips",
+    "price": 25,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Popcorn",
+    "category": "Snacks",
+    "description": "Light and crunchy popcorn",
+    "price": 40,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Mixed Nuts",
+    "category": "Snacks",
+    "description": "Crunchy mixed nuts",
+    "price": 160,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1508061253366-f7da158b6d46?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Orange Juice",
+    "category": "Beverages",
+    "description": "Refreshing orange juice",
+    "price": 90,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Apple Juice",
+    "category": "Beverages",
+    "description": "Refreshing apple juice",
+    "price": 95,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1576673442511-ee2b6f6c5a70?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Mineral Water",
+    "category": "Beverages",
+    "description": "Packaged drinking water",
+    "price": 20,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1523362628745-0c100150b1a1?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Green Tea",
+    "category": "Beverages",
+    "description": "A soothing green tea",
+    "price": 110,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&auto=format&fit=crop&q=80"
+  },
+  {
+    "name": "Coffee",
+    "category": "Beverages",
+    "description": "Rich aromatic coffee",
+    "price": 140,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&auto=format&fit=crop&q=80"
+  }
+]
