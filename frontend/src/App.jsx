@@ -21,7 +21,8 @@ RefreshCw,
 ShoppingBasket,
 } from "lucide-react";
 import "./App.css";
-const API_URL = "http://localhost:5000/api/products";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = `${API_BASE_URL}/api/products`;
 
 function loadRazorpayScript() {
   return new Promise((resolve) => {
@@ -203,7 +204,7 @@ async function openMyOrders() {
   setMyOrdersLoading(true);
   setMyOrdersError("");
   try {
-    const response = await axios.get("http://localhost:5000/api/orders/my-orders", {
+    const response = await axios.get(`${API_BASE_URL}/api/orders/my-orders`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setMyOrders(Array.isArray(response.data) ? response.data : []);
@@ -300,7 +301,7 @@ async function placeOrder(event) {
   try {
     // Ask the backend to create a Razorpay order using trusted database prices.
     const response = await axios.post(
-      "http://localhost:5000/api/orders/payment/create-order",
+      `${API_BASE_URL}/api/orders/payment/create-order`,
       {
         items: cart.map((item) => ({
           productId: item._id,
@@ -340,7 +341,7 @@ async function placeOrder(event) {
         setCheckoutLoading(true);
         try {
           const verificationResponse = await axios.post(
-            "http://localhost:5000/api/orders/payment/verify",
+            `${API_BASE_URL}/api/orders/payment/verify`,
             {
               razorpay_order_id: paymentResponse.razorpay_order_id,
               razorpay_payment_id: paymentResponse.razorpay_payment_id,
