@@ -1,10 +1,13 @@
 
-// ─── Environment configuration ──────────────────────────────────────────────
 require("dotenv").config();
+
+// ─── Environment configuration ──────────────────────────────────────────────
 
 const REQUIRED_ENV = ["MONGO_URI", "JWT_SECRET"];
 
-const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key]);
+const missingEnv = REQUIRED_ENV.filter(
+  (key) => !process.env[key]
+);
 
 if (missingEnv.length > 0) {
   console.error(
@@ -29,6 +32,7 @@ if (missingRecommended.length > 0) {
 }
 
 // ─── Imports ─────────────────────────────────────────────────────────────────
+
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
@@ -37,23 +41,31 @@ const connectDB = require("./config/db");
 const productRoutes = require("./routes/productRoutes");
 const authRoutes = require("./routes/authRoutes");
 const orderRoutes = require("./routes/orderRoutes");
-const { protect, adminOnly } = require("./middleware/authMiddleware");
+
+const {
+  protect,
+  adminOnly,
+} = require("./middleware/authMiddleware");
 
 const app = express();
 
 // ─── CORS CONFIGURATION ──────────────────────────────────────────────────────
 
-// Always allow the deployed FreshCart frontend.
+// Permanent FreshCart frontend URL.
 const allowedOrigins = [
   "https://fresh-cart-mocha-two.vercel.app",
 ];
 
-// Allow an additional frontend URL configured in Render.
+// Additional frontend URL from Render environment variables.
 if (process.env.FRONTEND_ORIGIN) {
   allowedOrigins.push(
     process.env.FRONTEND_ORIGIN.trim().replace(/\/$/, "")
   );
 }
+
+// Allow Vercel deployment URLs belonging to this project.
+const vercelOriginPattern =
+  /^https:\/\/fresh-cart(?:-[a-z0-9-]+)?-ravigopi857-projects\.vercel\.app$/;
 
 // Allow localhost only during development.
 if (process.env.NODE_ENV !== "production") {
@@ -68,16 +80,22 @@ if (process.env.NODE_ENV !== "production") {
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests without an Origin header (curl, server-to-server).
+      // Allow requests without an Origin header.
       if (!origin) {
         return callback(null, true);
       }
 
+      // Allow configured frontend URLs.
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      // Allow localhost variants during development only.
+      // Allow Vercel production and preview deployment URLs.
+      if (vercelOriginPattern.test(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow localhost during development.
       if (
         process.env.NODE_ENV !== "production" &&
         /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
@@ -85,20 +103,25 @@ app.use(
         return callback(null, true);
       }
 
-      console.error(`[FreshCart] Blocked CORS origin: ${origin}`);
+      console.error(
+        `[FreshCart] Blocked CORS origin: ${origin}`
+      );
 
       return callback(
         new Error(`CORS: origin '${origin}' is not allowed.`)
       );
     },
+
     credentials: true,
   })
 );
 
 // ─── Body parsing ────────────────────────────────────────────────────────────
+
 app.use(express.json({ limit: "2mb" }));
 
 // ─── Global rate limiter ────────────────────────────────────────────────────
+
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
@@ -112,6 +135,7 @@ const globalLimiter = rateLimit({
 app.use(globalLimiter);
 
 // ─── Authentication rate limiter ─────────────────────────────────────────────
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -124,11 +148,13 @@ const authLimiter = rateLimit({
 });
 
 // ─── API routes ──────────────────────────────────────────────────────────────
+
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/orders", orderRoutes);
 
 // ─── Authentication test ────────────────────────────────────────────────────
+
 app.get("/api/auth-test", protect, (req, res) => {
   res.json({
     message: "Authentication successful!",
@@ -137,6 +163,7 @@ app.get("/api/auth-test", protect, (req, res) => {
 });
 
 // ─── Admin test ─────────────────────────────────────────────────────────────
+
 app.get("/api/admin-test", protect, adminOnly, (req, res) => {
   res.json({
     message: "Admin access successful!",
@@ -144,13 +171,18 @@ app.get("/api/admin-test", protect, adminOnly, (req, res) => {
 });
 
 // ─── Home route ──────────────────────────────────────────────────────────────
+
 app.get("/", (req, res) => {
   res.send("FreshCart API is running!");
 });
 
 // ─── Error handler ──────────────────────────────────────────────────────────
+
 app.use((err, req, res, next) => {
-  console.error("[FreshCart] Server error:", err.message);
+  console.error(
+    "[FreshCart] Server error:",
+    err.message
+  );
 
   if (err.message && err.message.startsWith("CORS:")) {
     return res.status(403).json({
@@ -164,16 +196,27 @@ app.use((err, req, res, next) => {
 });
 
 // ─── Start server ────────────────────────────────────────────────────────────
+
 const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`FreshCart server running on port ${PORT}`);
-      console.log("Allowed CORS origins:", allowedOrigins);
+      console.log(
+        `FreshCart server running on port ${PORT}`
+      );
+
+      console.log(
+        "Allowed CORS origins:",
+        allowedOrigins
+      );
     });
   })
   .catch((error) => {
-    console.error("Failed to start FreshCart:", error.message);
+    console.error(
+      "Failed to start FreshCart:",
+      error.message
+    );
+
     process.exit(1);
   });
