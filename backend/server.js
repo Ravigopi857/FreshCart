@@ -1,40 +1,34 @@
 
-// ─── Environment variable validation ────────────────────────────────────────
-// Fail fast so a missing config never causes a cryptic mid-request crash.
+// ─── Environment configuration ──────────────────────────────────────────────
+require("dotenv").config();
+
 const REQUIRED_ENV = ["MONGO_URI", "JWT_SECRET"];
 
 const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key]);
+
 if (missingEnv.length > 0) {
-  // Load .env first so the check below is accurate even on a fresh clone.
-  require("dotenv").config();
-}
-
-// Re-check after loading .env
-require("dotenv").config();
-
-const stillMissing = REQUIRED_ENV.filter((key) => !process.env[key]);
-if (stillMissing.length > 0) {
   console.error(
-    `[FreshCart] Missing required environment variables: ${stillMissing.join(", ")}\n` +
-    `Please copy backend/.env.example to backend/.env and fill in the values.`
+    `[FreshCart] Missing required environment variables: ${missingEnv.join(", ")}`
   );
   process.exit(1);
 }
 
-// Warn (don't crash) about optional but recommended vars
 const RECOMMENDED_ENV = [
   "RAZORPAY_KEY_ID",
   "RAZORPAY_KEY_SECRET",
-  "FRONTEND_ORIGIN",
 ];
-const missingRecommended = RECOMMENDED_ENV.filter((key) => !process.env[key]);
+
+const missingRecommended = RECOMMENDED_ENV.filter(
+  (key) => !process.env[key]
+);
+
 if (missingRecommended.length > 0) {
   console.warn(
-    `[FreshCart] Optional environment variables not set: ${missingRecommended.join(", ")}. ` +
-    `Some features (payments, CORS restrictions) may not work as expected.`
+    `[FreshCart] Optional environment variables not set: ${missingRecommended.join(", ")}`
   );
 }
 
+// ─── Imports ─────────────────────────────────────────────────────────────────
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
@@ -47,15 +41,21 @@ const { protect, adminOnly } = require("./middleware/authMiddleware");
 
 const app = express();
 
-// ─── CORS ────────────────────────────────────────────────────────────────────
-// Allow the configured frontend origin (and localhost for development).
-const allowedOrigins = [];
+// ─── CORS CONFIGURATION ──────────────────────────────────────────────────────
 
+// Always allow the deployed FreshCart frontend.
+const allowedOrigins = [
+  "https://fresh-cart-mocha-two.vercel.app",
+];
+
+// Allow an additional frontend URL configured in Render.
 if (process.env.FRONTEND_ORIGIN) {
-  allowedOrigins.push(process.env.FRONTEND_ORIGIN.trim());
+  allowedOrigins.push(
+    process.env.FRONTEND_ORIGIN.trim().replace(/\/$/, "")
+  );
 }
 
-// Always allow localhost variants in development
+// Allow localhost only during development.
 if (process.env.NODE_ENV !== "production") {
   allowedOrigins.push(
     "http://localhost:5173",
@@ -68,60 +68,67 @@ if (process.env.NODE_ENV !== "production") {
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
-      if (!origin) return callback(null, true);
+      // Allow requests without an Origin header (curl, server-to-server).
+      if (!origin) {
+        return callback(null, true);
+      }
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      // In development without FRONTEND_ORIGIN set, allow any localhost origin
+      // Allow localhost variants during development only.
       if (
         process.env.NODE_ENV !== "production" &&
-        !process.env.FRONTEND_ORIGIN &&
         /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
       ) {
         return callback(null, true);
       }
 
-      return callback(new Error(`CORS: origin '${origin}' is not allowed.`));
+      console.error(`[FreshCart] Blocked CORS origin: ${origin}`);
+
+      return callback(
+        new Error(`CORS: origin '${origin}' is not allowed.`)
+      );
     },
     credentials: true,
   })
 );
 
-// ─── Body parsing ─────────────────────────────────────────────────────────────
+// ─── Body parsing ────────────────────────────────────────────────────────────
 app.use(express.json({ limit: "2mb" }));
 
-// ─── Global rate limiter (all routes) ────────────────────────────────────────
+// ─── Global rate limiter ────────────────────────────────────────────────────
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { message: "Too many requests. Please try again later." },
+  message: {
+    message: "Too many requests. Please try again later.",
+  },
 });
+
 app.use(globalLimiter);
 
-// ─── Strict rate limiter for auth routes ─────────────────────────────────────
+// ─── Authentication rate limiter ─────────────────────────────────────────────
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 login/register attempts per window per IP
+  windowMs: 15 * 60 * 1000,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     message:
       "Too many authentication attempts. Please wait 15 minutes before trying again.",
   },
-  // Skip successful requests from the count so legitimate users aren't blocked
-  skipSuccessfulRequests: false,
 });
 
-// ─── API routes ───────────────────────────────────────────────────────────────
+// ─── API routes ──────────────────────────────────────────────────────────────
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/orders", orderRoutes);
 
+// ─── Authentication test ────────────────────────────────────────────────────
 app.get("/api/auth-test", protect, (req, res) => {
   res.json({
     message: "Authentication successful!",
@@ -129,27 +136,41 @@ app.get("/api/auth-test", protect, (req, res) => {
   });
 });
 
+// ─── Admin test ─────────────────────────────────────────────────────────────
 app.get("/api/admin-test", protect, adminOnly, (req, res) => {
   res.json({
     message: "Admin access successful!",
   });
 });
 
-// Home route
+// ─── Home route ──────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
   res.send("FreshCart API is running!");
 });
 
-// ─── Start server ─────────────────────────────────────────────────────────────
+// ─── Error handler ──────────────────────────────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error("[FreshCart] Server error:", err.message);
+
+  if (err.message && err.message.startsWith("CORS:")) {
+    return res.status(403).json({
+      message: "Frontend origin is not allowed.",
+    });
+  }
+
+  res.status(500).json({
+    message: "Internal server error.",
+  });
+});
+
+// ─── Start server ────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`FreshCart server running on port ${PORT}`);
-      console.log(
-        `Allowed CORS origins: ${allowedOrigins.length ? allowedOrigins.join(", ") : "any localhost (dev mode)"}`
-      );
+      console.log("Allowed CORS origins:", allowedOrigins);
     });
   })
   .catch((error) => {
