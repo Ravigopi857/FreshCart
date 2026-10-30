@@ -1,6 +1,5 @@
 import "./Auth.css";
 import { useState } from "react";
-import axios from "axios";
 import {
   ArrowLeft,
   Eye,
@@ -10,8 +9,8 @@ import {
   Mail,
   UserRound,
 } from "lucide-react";
-
-const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth`;
+import { loginUser, registerUser } from "../services/api";
+import { saveAuth } from "../utils/auth";
 
 export default function Auth({ onClose, onLoginSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -27,10 +26,7 @@ export default function Auth({ onClose, onLoginSuccess }) {
   });
 
   const handleChange = (event) => {
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
+    setForm({ ...form, [event.target.name]: event.target.value });
     setError("");
     setSuccess("");
   };
@@ -48,20 +44,16 @@ export default function Auth({ onClose, onLoginSuccess }) {
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? "/login" : "/register";
-
-      const response = await axios.post(`${API_URL}${endpoint}`, {
-        ...(isLogin ? {} : { name: form.name.trim() }),
-        email: form.email.trim().toLowerCase(),
-        password: form.password,
-      });
-
       if (isLogin) {
+        const response = await loginUser(
+          form.email.trim().toLowerCase(),
+          form.password
+        );
+
         const { token, user } = response.data;
 
-        // Keep the token for authenticated API requests.
-        sessionStorage.setItem("freshcart_token", token);
-        sessionStorage.setItem("freshcart_user", JSON.stringify(user));
+        // ── Bug #1 fix: use centralised auth storage (localStorage-backed) ──
+        saveAuth(token, user);
 
         setSuccess("Login successful!");
 
@@ -69,12 +61,15 @@ export default function Auth({ onClose, onLoginSuccess }) {
           onLoginSuccess(user);
         }
       } else {
+        await registerUser(
+          form.name.trim(),
+          form.email.trim().toLowerCase(),
+          form.password
+        );
+
         setSuccess("Account created! You can now log in.");
         setIsLogin(true);
-        setForm((current) => ({
-          ...current,
-          password: "",
-        }));
+        setForm((current) => ({ ...current, password: "" }));
       }
     } catch (err) {
       setError(
@@ -86,14 +81,16 @@ export default function Auth({ onClose, onLoginSuccess }) {
     }
   };
 
+  const switchTab = (toLogin) => {
+    setIsLogin(toLogin);
+    setError("");
+    setSuccess("");
+  };
+
   return (
     <div className="auth-page">
       <section className="auth-card">
-        <button
-          type="button"
-          className="auth-back"
-          onClick={onClose}
-        >
+        <button type="button" className="auth-back" onClick={onClose}>
           <ArrowLeft size={18} />
           Back to FreshCart
         </button>
@@ -122,23 +119,14 @@ export default function Auth({ onClose, onLoginSuccess }) {
           <button
             type="button"
             className={isLogin ? "active" : ""}
-            onClick={() => {
-              setIsLogin(true);
-              setError("");
-              setSuccess("");
-            }}
+            onClick={() => switchTab(true)}
           >
             Login
           </button>
-
           <button
             type="button"
             className={!isLogin ? "active" : ""}
-            onClick={() => {
-              setIsLogin(false);
-              setError("");
-              setSuccess("");
-            }}
+            onClick={() => switchTab(false)}
           >
             Sign up
           </button>
@@ -189,9 +177,7 @@ export default function Auth({ onClose, onLoginSuccess }) {
                 placeholder="At least 8 characters"
                 value={form.password}
                 onChange={handleChange}
-                autoComplete={
-                  isLogin ? "current-password" : "new-password"
-                }
+                autoComplete={isLogin ? "current-password" : "new-password"}
                 minLength={8}
                 required
               />
@@ -209,22 +195,16 @@ export default function Auth({ onClose, onLoginSuccess }) {
           {error && <p className="auth-message error">{error}</p>}
           {success && <p className="auth-message success">{success}</p>}
 
-          <button
-            className="auth-submit"
-            type="submit"
-            disabled={loading}
-          >
+          <button className="auth-submit" type="submit" disabled={loading}>
             {loading
               ? "Please wait..."
               : isLogin
-                ? "Login to FreshCart"
-                : "Create account"}
+              ? "Login to FreshCart"
+              : "Create account"}
           </button>
         </form>
 
-        <p className="auth-footer">
-          Fresh groceries, delivered with care.
-        </p>
+        <p className="auth-footer">Fresh groceries, delivered with care.</p>
       </section>
     </div>
   );

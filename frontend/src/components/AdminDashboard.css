@@ -253,3 +253,26 @@
     align-items: flex-start;
   }
 }
+
+@keyframes admin-spin {
+  to { transform: rotate(360deg); }
+}
+
+.admin-spin {
+  animation: admin-spin 0.8s linear infinite;
+}
+
+.admin-primary-btn:disabled,
+.admin-secondary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-category-badge {
+  background: #eaf6ee;
+  color: #18864b;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+}

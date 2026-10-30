@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const orderItemSchema = new mongoose.Schema(
@@ -22,6 +21,10 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+    image: {
+      type: String,
+      default: "",
+    },
   },
   { _id: false }
 );
@@ -32,6 +35,18 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    customerName: {
+      type: String,
+      default: "",
+    },
+    customerEmail: {
+      type: String,
+      default: "",
+    },
+    customerPhone: {
+      type: String,
+      default: "",
     },
     items: {
       type: [orderItemSchema],
@@ -46,33 +61,54 @@ const orderSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    city: {
+      type: String,
+      default: "",
+    },
+    state: {
+      type: String,
+      default: "",
+    },
     pincode: {
       type: String,
       required: true,
       match: /^\d{6}$/,
+    },
+    deliverySlot: {
+      type: String,
+      default: "Express Delivery (within 2 hours)",
+    },
+    deliveryInstructions: {
+      type: String,
+      default: "",
+    },
+    subtotal: {
+      type: Number,
+      default: 0,
+    },
+    deliveryFee: {
+      type: Number,
+      default: 0,
     },
     totalAmount: {
       type: Number,
       required: true,
       min: 0,
     },
-        paymentStatus: {
+    paymentStatus: {
       type: String,
       enum: ["Pending", "Paid", "Failed", "NotRequired"],
       default: "NotRequired",
     },
-
     paymentProvider: {
       type: String,
       enum: ["Razorpay", "COD"],
-      default: undefined,
+      default: "COD",
     },
-
     razorpayOrderId: {
       type: String,
       default: undefined,
     },
-
     razorpayPaymentId: {
       type: String,
       default: undefined,

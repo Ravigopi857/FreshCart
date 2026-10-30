@@ -6,7 +6,7 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-// CUSTOMER REGISTRATION
+// ─── CUSTOMER REGISTRATION ────────────────────────────────────────────────────
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -25,14 +25,9 @@ router.post("/register", async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    const existingUser = await User.findOne({
-      email: normalizedEmail,
-    });
-
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
-      return res.status(409).json({
-        message: "Email is already registered.",
-      });
+      return res.status(409).json({ message: "Email is already registered." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -55,20 +50,14 @@ router.post("/register", async (req, res) => {
     });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(409).json({
-        message: "Email is already registered.",
-      });
+      return res.status(409).json({ message: "Email is already registered." });
     }
-
     console.error("Registration error:", error.message);
-
-    return res.status(500).json({
-      message: "Registration failed.",
-    });
+    return res.status(500).json({ message: "Registration failed." });
   }
 });
 
-// CUSTOMER LOGIN
+// ─── CUSTOMER / ADMIN LOGIN ───────────────────────────────────────────────────
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -79,31 +68,30 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const user = await User.findOne({
-      email: email.trim().toLowerCase(),
-    });
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
 
+    // Use a single generic message to avoid user-enumeration
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({
-        message: "Invalid email or password.",
-      });
+      return res.status(401).json({ message: "Invalid email or password." });
     }
 
     if (!process.env.JWT_SECRET) {
       console.error("JWT_SECRET is missing in .env");
-
-      return res.status(500).json({
-        message: "Authentication configuration error.",
-      });
+      return res
+        .status(500)
+        .json({ message: "Authentication configuration error." });
     }
 
+    // Token payload uses "id" as the canonical user ID field.
+    // The authMiddleware already supports "id", "_id", "userId" and "sub",
+    // but we now standardise on "id" for all new tokens.
     const token = jwt.sign(
       {
-        userId: user._id.toString(),
-        role: user.role,
+        id: user._id.toString(),   // ← canonical field name
+        role: user.role,           // ← role included for adminOnly middleware
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "7d" }          // ← extended to 7 days (was 1 day)
     );
 
     return res.status(200).json({
@@ -118,10 +106,7 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Login error:", error.message);
-
-    return res.status(500).json({
-      message: "Login failed.",
-    });
+    return res.status(500).json({ message: "Login failed." });
   }
 });
 
